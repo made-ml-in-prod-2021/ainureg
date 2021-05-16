@@ -1,0 +1,5 @@
+DEFAULT_DATA_PATH: data/heart.csv
+FAKE_DATA_PATH: data/fake_data.csv
+seed: 42
+train_size: 0.75
+
