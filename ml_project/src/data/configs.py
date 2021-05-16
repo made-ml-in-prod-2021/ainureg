@@ -10,6 +10,7 @@ class PipeParams:
     train_size: float
     DEFAULT_DATA_PATH: str
     FAKE_DATA_PATH: str
+    DEFAULT_PREDICTS_SAVE_PATH: str
 
 PipeParamsSchema = class_schema(PipeParams)
 

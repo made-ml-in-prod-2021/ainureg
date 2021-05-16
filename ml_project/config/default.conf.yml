@@ -1,5 +1,6 @@
 DEFAULT_DATA_PATH: data/heart.csv
 FAKE_DATA_PATH: data/fake_data.csv
+DEFAULT_PREDICTS_SAVE_PATH: data/predicts.csv
 seed: 42
 train_size: 0.75
 
