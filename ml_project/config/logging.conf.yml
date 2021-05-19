@@ -21,7 +21,7 @@ handlers:
 loggers:
   homework1:
     level: DEBUG
-    handlers: [error_handler, console]
+    handlers: [console]
     propogate: no
   faker.factory:
     level: CRITICAL
