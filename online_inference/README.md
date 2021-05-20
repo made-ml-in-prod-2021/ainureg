@@ -6,24 +6,32 @@ done
 1) Оберните inference вашей модели в rest сервис(вы можете использовать как FastAPI, так и flask, другие желательно не использовать, дабы не плодить излишнего разнообразия для проверяющих), должен быть endpoint /predict (3 балла)
 
 done
+
 2) Напишите тест для /predict  (3 балла) (https://fastapi.tiangolo.com/tutorial/testing/, https://flask.palletsprojects.com/en/1.1.x/testing/)
 
  no
+ 
 3) Напишите скрипт, который будет делать запросы к вашему сервису -- 2 балла
 
 done
+
 4) Сделайте валидацию входных данных (например, порядок колонок не совпадает с трейном, типы не те и пр, в рамках вашей фантазии)  (вы можете сохранить вместе с моделью доп информацию, о структуре входных данных, если это нужно) -- 3 доп балла
 https://fastapi.tiangolo.com/tutorial/handling-errors/ -- возращайте 400, в случае, если валидация не пройдена
 
 no
+
 5) Напишите dockerfile, соберите на его основе образ и запустите локально контейнер(docker build, docker run), внутри контейнера должен запускать сервис, написанный в предущем пункте, закоммитьте его, напишите в readme корректную команду сборки (4 балл)
 
+```
 docker build -f online_inference/Dockerfile  -t ainureg/prod_made . &&  docker run -p 80:80  --rm -it ainureg/prod_made:latest
 
+```
 6) Оптимизируйте размер docker image (3 доп балла) (опишите в readme.md что вы предприняли для сокращения размера и каких результатов удалось добиться)  -- https://docs.docker.com/develop/develop-images/dockerfile_best-practices/
 
 no
+
 7) опубликуйте образ в https://hub.docker.com/, используя docker push (вам потребуется зарегистрироваться) (2 балла)
+
 done
 ```
 (V) ~/Desktop/made/prod/hw/ainureg$ docker push ainureg/prod_made:latest
@@ -67,5 +75,7 @@ docker.io/ainureg/prod_made:latest
 200
 
 5) проведите самооценку -- 1 доп балл
+
    0[баллов](0[задание] ) + 3[1] + 0[2] + 2[3] + 0[4] + 4[5] + 0[6] + 2[7] +1[8] + 1[5*] = 13 
+   
 6) создайте пулл-реквест и поставьте label -- hw2 
