@@ -70,9 +70,11 @@ Status: Downloaded newer image for ainureg/prod_made:latest
 docker.io/ainureg/prod_made:latest
 ```
 
+```
 ~/Desktop/made/prod/hw/ainureg/online_inference$ ./homework_script.py 
 [0, 37.0, 0.0, 4.0, 944.0, 384.0, 1.0, 2.0, 553.0, 1.0, 0.8, 1.0, 1.0, 3.0]
 200
+```
 
 5) проведите самооценку -- 1 доп балл
 
