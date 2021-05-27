@@ -30,7 +30,7 @@ columns = [
 
 logger = logging.getLogger("homework1")
 
-def datagenerate(records: int, headers=columns):
+def datagenerate(records: int, headers=columns, fake_data_path =str(Path(fake_data_path).resolve()) ):
     with open(fake_data_path, "wt") as csvFile:
         writer = csv.DictWriter(csvFile, fieldnames=headers)
         writer.writeheader()
@@ -54,4 +54,4 @@ def datagenerate(records: int, headers=columns):
                 }
             )
 
-        logger.info("fake data saved as %s", str(Path(fake_data_path).resolve()))
+        logger.info("fake data saved as %s", fake_data_path)

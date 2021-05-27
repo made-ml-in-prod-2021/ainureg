@@ -16,7 +16,7 @@ handlers:
   error_handler:
     class: logging.FileHandler
     level: WARN
-    filename: ml_project/log/errors.logs
+    filename: errors.logs
     formatter: full
 loggers:
   homework1:

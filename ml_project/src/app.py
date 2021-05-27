@@ -13,8 +13,8 @@ from sklearn.ensemble import RandomForestClassifier
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from IPython import embed
-from data.configs import read_pipeline_params
-from utils import setup_logging
+from .data.configs import read_pipeline_params
+from .utils import setup_logging
 
 params = read_pipeline_params()
 
