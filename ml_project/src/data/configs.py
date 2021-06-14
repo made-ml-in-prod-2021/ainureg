@@ -2,9 +2,14 @@ from marshmallow_dataclass import class_schema
 from dataclasses import dataclass, field
 from typing import List
 
-CONFIG_PATH = (
-    "/home/ainur/Desktop/made/prod/hw/ainureg/ml_project/config/default.conf.yml"
-)
+
+from pathlib import Path
+
+# CONFIG_PATH = (
+#             "/home/ainur/Desktop/made/prod/hw/ainureg/ml_project/config/default.conf.yml"
+#         )
+CONFIG_PATH = (Path(__file__).parent.parent.parent / "config" / 'default.conf.yml').resolve()
+
 import yaml
 
 
