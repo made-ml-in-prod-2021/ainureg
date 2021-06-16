@@ -20,9 +20,6 @@ data_folder = "/opt/airflow/data/"
 
 
 def _preprocessing():
-    print(os.listdir(data_folder))
-    print(os.getcwd())
-    print(sys.path)
     time_folders = os.listdir(os.path.join(data_folder, "raw"))
     for case in time_folders:
         file = os.path.join(data_folder, "raw", case, "data.csv")
