@@ -4,7 +4,6 @@ import pathlib
 import sys
 
 from airflow import DAG
-from airflow.models import TaskInstance
 from airflow.operators.bash import BashOperator
 from airflow.operators.python import PythonOperator
 from airflow.utils.dates import days_ago
@@ -13,17 +12,7 @@ system_path = pathlib.Path(__file__).parent.parent.resolve()
 sys.path.append(str(system_path))
 from ml_project.test.test_model import datagenerate
 
-
-# These args will get passed on to each operator
-# You can override them on a per-task basis during operator initialization
-default_args = {
-    "owner": "airflow",
-    "depends_on_past": False,
-    "start_date": days_ago(2),
-    "email": ["airflow@example.com"],
-    "retries": 1,
-    "retry_delay": timedelta(minutes=5),
-}
+DATA_FODLER = "/opt/airflow/data"
 
 
 def _get_data(
@@ -31,25 +20,22 @@ def _get_data(
     month: str,
     day: str,
     hour: str,
-    task_instance: TaskInstance,
-    execution_date,
-    output_dir: str = "/opt/airflow/data",
+    output_dir: str,
 ):
-    data_folder = os.path.join(
+    full_data_folder = os.path.join(
         output_dir,
         "raw",
         f"{year}_{month}_{day}_{hour}",
     )
-    pathlib.Path(data_folder).mkdir(parents=True, exist_ok=True)
-
-    datagenerate(100, os.path.join(data_folder, "data.csv"))
+    pathlib.Path(full_data_folder).mkdir(parents=True, exist_ok=True)
+    datagenerate(100, os.path.join(full_data_folder, "data.csv"))
 
 
 with DAG(
     dag_id="data_generate",
-    default_args=default_args,
-    description="A simple tutorial DAG",
-    schedule_interval=timedelta(minutes=2),
+    start_date=days_ago(2),
+    description="new data generating dag",
+    schedule_interval=timedelta(hours=1),
 ) as dag:
 
     get_data = PythonOperator(
@@ -60,13 +46,8 @@ with DAG(
             "month": "{{ execution_date.month }}",
             "day": "{{ execution_date.day }}",
             "hour": "{{ execution_date.hour }}",
-            "output_dir": "/opt/airflow/data",
+            "output_dir": DATA_FODLER,
         },
     )
 
-    bash_example = BashOperator(
-        task_id="bash_command",
-        bash_command="echo {{ ds }}",
-    )
-
-    bash_example >> get_data
+    get_data
