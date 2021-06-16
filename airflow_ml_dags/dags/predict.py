@@ -1,8 +1,9 @@
- 
 import json
 import os
 import pathlib
 import sys
+import pickle
+from datetime import timedelta
 
 import airflow
 import requests
@@ -11,10 +12,8 @@ from airflow import DAG
 from airflow.operators.bash import BashOperator
 from airflow.operators.python import PythonOperator
 import pandas as pd
-from datetime import timedelta
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
-import pickle
 import airflow.utils.dates
 from airflow import DAG
 from airflow.models import TaskInstance

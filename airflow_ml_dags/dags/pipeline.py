@@ -1,19 +1,17 @@
-import json
 import os
-import pathlib
 import sys
-
-import airflow
 import requests
 import requests.exceptions as requests_exceptions
+import pickle
+from datetime import timedelta
+
+import airflow
 from airflow import DAG
 from airflow.operators.bash import BashOperator
 from airflow.operators.python import PythonOperator
 import pandas as pd
-from datetime import timedelta
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
-import pickle
 import airflow.utils.dates
 from airflow import DAG
 from airflow.models import TaskInstance
@@ -26,13 +24,12 @@ def _preprocessing():
     print(os.getcwd())
     print(sys.path)
     time_folders = os.listdir(os.path.join(data_folder, "raw"))
-
     for case in time_folders:
-        file = os.path.join(data_folder, "raw",case,  "data.csv")
+        file = os.path.join(data_folder, "raw", case, "data.csv")
         data = pd.read_csv(file)
         target = data["target"].astype(int)
         features = data.loc[:, data.columns != "target"]
-        new_folder = os.path.join(data_folder, "processed" ,  case)
+        new_folder = os.path.join(data_folder, "processed", case)
         os.makedirs(new_folder, exist_ok=True)
         target.to_csv(os.path.join(new_folder, "target.csv"), index=False)
         features.to_csv(os.path.join(new_folder, "train_data.csv"), index=False)
@@ -40,7 +37,7 @@ def _preprocessing():
 
 def _split_data():
 
-    time_folders = os.listdir(os.path.join(data_folder,  "processed"))
+    time_folders = os.listdir(os.path.join(data_folder, "processed"))
     F = pd.DataFrame()
     T = pd.DataFrame()
     for case in time_folders:
@@ -53,10 +50,18 @@ def _split_data():
     f_train, f_val = train_test_split(F)
     t_train, t_val = train_test_split(T)
 
-    t_train.to_csv(os.path.join(data_folder, "split", "target_train.csv"), index_label=False)
-    t_val.to_csv(os.path.join(data_folder, "split", "target_val.csv"), index_label=False)
-    f_train.to_csv(os.path.join(data_folder, "split", "features_train.csv"), index_label=False)
-    f_val.to_csv(os.path.join(data_folder, "split", "features_val.csv"), index_label=False)
+    t_train.to_csv(
+        os.path.join(data_folder, "split", "target_train.csv"), index_label=False
+    )
+    t_val.to_csv(
+        os.path.join(data_folder, "split", "target_val.csv"), index_label=False
+    )
+    f_train.to_csv(
+        os.path.join(data_folder, "split", "features_train.csv"), index_label=False
+    )
+    f_val.to_csv(
+        os.path.join(data_folder, "split", "features_val.csv"), index_label=False
+    )
 
 
 def model_fit(
@@ -74,57 +79,41 @@ def model_fit(
     X_train, y_train = pd.read_csv(data_path), pd.read_csv(target_path)
     y_train = y_train.astype(int)
 
-    print("shapes: ", X_train.shape, y_train.shape)
     classifier = RandomForestClassifier()
-    print(X_train.shape, y_train.shape)
     classifier.fit(X_train, y_train)
-    folder = os.path.join(data_folder, 'model', save_path)
-    print("FOLDER IS ", folder)
-    os.makedirs(folder,exist_ok=True )
-    path = os.path.join(folder, 'model.pkl')
-    print("Model fit!")
-    # os.makedirs(save_path, exist_ok=True)
-    with open( path,  "wb") as f:
+    folder = os.path.join(data_folder, "model", save_path)
+    os.makedirs(folder, exist_ok=True)
+    path = os.path.join(folder, "model.pkl")
+    with open(path, "wb") as f:
         pickle.dump(classifier, f)
     return classifier
-    # return classifier
+
 
 def model_validate(
-    data_path: str, target_path: str, save_path:str, model: RandomForestClassifier
+    data_path: str, target_path: str, save_path: str, model: RandomForestClassifier
 ) -> RandomForestClassifier:
     """Function to fit random forest
 
-        Args:
-        data_path: path to data
+    Args:
+        data_path: path to feature
+        target_path: path to targets
+        save_path: the path of the model we validate
 
-    Returns:
-        fitted model
 
     """
     X_val, y_val = pd.read_csv(data_path), pd.read_csv(target_path)
-    print("shapes: ", X_val.shape, y_val.shape)
     y_val = y_val.astype(int)
     score = model.score(X_val, y_val)
-    file =os.path.join(data_folder, 'model', save_path, 'score.txt') 
-    with open(file, 'w') as f:
-        print("score: ", score,file=f)
+    file = os.path.join(data_folder, "model", save_path, "score.txt")
+    with open(file, "w") as f:
+        print("score: ", score, file=f)
 
-    # classifier.fit(X_val, y_val)
-    # folder = os.path.join(data_folder, 'model', save_path)
-    # print("FOLDER IS ", folder)
-    # os.makedirs(folder,exist_ok=True )
-    # path = os.path.join(folder, 'model.pkl')
-    # print("Model fit!")
-    # # os.makedirs(save_path, exist_ok=True)
-    # with open( path,  "wb") as f:
-    #     pickle.dump(classifier, f)
-    # return classifier
 
 def _model_fit(save_path: str) -> RandomForestClassifier:
     """Function to fit random forest
 
         Args:
-        data_path: path to data
+        save_path: path to data
 
     Returns:
         fitted model
@@ -137,6 +126,7 @@ def _model_fit(save_path: str) -> RandomForestClassifier:
 
     model = model_fit(f_train, t_train, save_path)
     model_validate(f_val, t_val, save_path, model)
+
 
 with DAG(
     dag_id="pipeline",
@@ -157,19 +147,9 @@ with DAG(
         task_id="fit_model",
         python_callable=_model_fit,
         op_kwargs={
-            # "year": "{{ execution_date.year }}",
-            # "month": "{{ execution_date.month }}",
-            # "day": "{{ execution_date.day }}",
-            # "hour": "{{ execution_date.hour }}",
             "save_path": "/opt/airflow/data/models/"
             + "{{ execution_date.year }}_{{ execution_date.month }}_{{ execution_date.day }}_{{ execution_date.hour }}",
         },
     )
 
-    # bash = BashOperator(
-    #     task_id="just_bash",
-    #     bash_command="echo pwd",
-    #     dag=dag,
-    # )
-
-    preprocessing >> split >> fit #>>bash
+    preprocessing >> split >> fit
